@@ -1,0 +1,21 @@
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!.projectile
+!init.el
+!custom-vars.el
+!MrabsencePackages/
+!MrabsencePackages/**
+!myMacros/
+!myMacros/**
+!mySnippets/
+!mySnippets/**
+# etc...
+
+# Ignore all files ending with ~
+*~
+
+# ...even if they are in subdirectories (N/A here)
+# !*/

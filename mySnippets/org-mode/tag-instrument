@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: tag-instrument
+# key: #fti
+# --
+#+filetags: Instrument
+$0

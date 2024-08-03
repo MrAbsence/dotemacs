@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: org-insert-figdir
+# key: [[f
+# --
+
+[[figdir:$0]]

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: tag-instrument
+# key: #ftc
+# --
+#+filetags: AConcept
+$0

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: org-journal-clocktable
+# key:<jct 
+# --
+
+#+BEGIN: clocktable :scope file :maxlevel 4 :emphasize 1 :formatter gy/journal-clocktable-write
+
+#+END:

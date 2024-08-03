@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: py-author
+# key: /au
+# --
+##################################################################
+# Author: ${1:MrAbsence}
+# Filename: `(file-name-nondirectory (buffer-file-name))`
+# Copyright `(format-time-string "%Y")`
+##################################################################
+
+$0
