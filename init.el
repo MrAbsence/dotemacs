@@ -848,6 +848,8 @@
       ("m" "Metrics Capture")
       ("mw" "Weight" table-line (file+headline (lambda () (expand-file-name "MyNotes/90-DayPlanner/Metrics.org" gy-dropbox-location)) "Weight")
        "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+  ;;So link to org can do text search
+  (setq org-link-search-must-match-exact-headline nil)
 
   (define-key global-map (kbd "C-c j")
    (lambda () (interactive) (org-capture nil nil)))
