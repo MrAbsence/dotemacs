@@ -422,7 +422,7 @@
 ;; It was loaded in ivy. Here is some config
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
-	 ("C-x b" . counsel-ibuffer)
+	 ("C-x b" . counsel-switch-buffer) ;; can use C-d to kill buffer, M-o to operate
 	 ("C-x C-f" . counsel-find-file)
 	 :map minibuffer-local-map
 	 ("C-r" . 'counsel-minibuffer-history)))
@@ -608,8 +608,8 @@
 
   ;; Set faces for heading levels
   ;; Note: they inherit from outline-X faces (see outline mode section)
-  (dolist (face '((org-level-1 . 1.25)
-                  (org-level-2 . 1.12)
+  (dolist (face '((org-level-1 . 1.35)
+                  (org-level-2 . 1.1)
                   (org-level-3 . 1.0)
                   (org-level-4 . 1.0)
                   (org-level-5 . 1.0)
@@ -756,15 +756,23 @@
   (setq org-tag-alist
     '((:startgroup)
        ; Put mutually exclusive tags here
-       (:endgroup)
-       ("@personal" . ?P)
-       ("@home" . ?H)
-       ("work" . ?W)
-       ("read" . ?r)
-       ("write" . ?w)
-       ("publish" . ?p)
-       ("experiment" . ?e)
-       ("idea" . ?i)))
+      (:endgroup)
+      ;; Places
+      ("@medical" . ?M)
+      ("@home" . ?H)
+      ("@work" . ?W)
+
+      ;; Activities
+      ("planning" . ?n)
+      ("readAndLearn" . ?r)
+      ("writing" . ?w)
+      ("programming" . ?p)
+      ("labExperiment" . ?l)
+      ("creative" . ?c)
+      ("email" . ?e)
+      ("callOrMeet" . ?m)
+      ("presenting" . ?s)
+      ))
 
   ;; Configure custom agenda views
   ;; Should rewrite this someday
@@ -937,7 +945,7 @@
   )
 
 (defun gy/org-mode-visual-fill ()
-  (setq visual-fill-column-width 130
+  (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 ;;let org mode display in the center of the screen
