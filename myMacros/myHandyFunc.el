@@ -94,6 +94,14 @@
   (concat "Please note: " "Key concept; Spectial methods; Key results and discussions"))
 ;;TO MY SURPRISE, IT WORKS!!!
 
+;; Bind this to C-c n I in org-roam settings
+(defun org-roam-node-insert-immediate (arg &rest args)
+  (interactive "P")
+  (let ((args (cons arg args))
+        (org-roam-capture-templates (list (append (car org-roam-capture-templates)
+                                                  '(:immediate-finish t)))))
+    (apply #'org-roam-node-insert args)))
+
 (defun gy/file-to-string-by-filename (filename)
   "File to string function"
   (with-temp-buffer

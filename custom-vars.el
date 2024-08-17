@@ -43,7 +43,7 @@
        (mode . gnus-summary-mode)
        (mode . gnus-article-mode)))))
  '(package-selected-packages
-   '(magit counsel-projectile projectile bind-key dired-preview erc xref idlwave eglot eldoc faceup flymake jsonrpc org project soap-client tramp verilog-mode elfeed python-mode seq org-inline-anim deadgrep wolfram-mode org-contrib conda compat yasnippet all-the-icons-dired emacsql org-roam ace-window visual-fill-column org-bullets helpful counsel which-key rainbow-delimiters doom-themes all-the-icons doom-modeline ivy use-package))
+   '(gnugo gnu-elpa-keyring-update magit counsel-projectile projectile bind-key dired-preview erc xref idlwave eglot eldoc faceup flymake jsonrpc org project soap-client tramp verilog-mode elfeed python-mode seq org-inline-anim deadgrep wolfram-mode org-contrib conda compat yasnippet all-the-icons-dired emacsql org-roam ace-window visual-fill-column org-bullets helpful counsel which-key rainbow-delimiters doom-themes all-the-icons doom-modeline ivy use-package))
  '(safe-local-variable-values
    '((eval my-buffer-local-set-key
 	   (kbd "M-<up>")

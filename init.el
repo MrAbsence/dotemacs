@@ -608,7 +608,7 @@
 
   ;; Set faces for heading levels
   ;; Note: they inherit from outline-X faces (see outline mode section)
-  (dolist (face '((org-level-1 . 1.35)
+  (dolist (face '((org-level-1 . 1.2)
                   (org-level-2 . 1.1)
                   (org-level-3 . 1.0)
                   (org-level-4 . 1.0)
@@ -772,6 +772,8 @@
       ("email" . ?e)
       ("callOrMeet" . ?m)
       ("presenting" . ?s)
+      ("submitOrUpload" . ?u)
+      ("discussInMeet" . ?d)
       ))
 
   ;; Configure custom agenda views
@@ -1000,8 +1002,10 @@
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
+	 ("C-c n I" . org-roam-node-insert-immediate)
          :map org-mode-map
          ("C-M-i"    . completion-at-point))
+  
   ;;demand here is very important
   :demand
   :config
