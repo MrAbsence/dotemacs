@@ -12,8 +12,6 @@
 !myMacros/**
 !mySnippets/
 !mySnippets/**
-!rime/
-!rime/**
 # etc...
 
 # Ignore all files ending with ~
