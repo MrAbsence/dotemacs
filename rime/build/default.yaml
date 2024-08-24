@@ -140,7 +140,6 @@ switcher:
   fold_options: true
   hotkeys:
     - "Control+grave"
-    - "Control+Shift+grave"
     - F4
   option_list_separator: "／"
   save_options:
