@@ -208,11 +208,13 @@
 
 ;;★★★ default font and font size
 ;; This line works well in Win32
-(set-face-attribute 'default nil :family "Consolas" :height 155)
+;; check and install fonts in Dropbox/EmacsConfig/font
+
+(set-face-attribute 'default nil :family "CodeNewRoman Nerd Font Mono" :height 155)
 
 ;; set fonts for fixed pitch and varible pitch
 (set-face-attribute 'fixed-pitch nil
-                    :font "Consolas"
+                    :font "CodeNewRoman Nerd Font Mono"
                     :weight 'regular
                     :height 155)
 
@@ -564,6 +566,22 @@
               "\\|iso\\|epub\\|pdf\\)"))
   )
 
+;;★★★ Rime input method
+
+;; you need to "sudo apt install librime-dev" on ubuntu
+;; The default rime config file is in .emacs.d/rime
+(use-package rime
+  :custom
+  (default-input-method "rime"))
+
+;; Transfer these key bindings to Rime
+;; 已经将输入法切换至简体
+;; 进入输入法后，可用C-`组合键切换至简体。
+;; 但如果未进入输入法，C-`还是切換窗口
+(setq rime-translate-keybindings
+  '("C-`" "C-f" "C-b" "C-n" "C-p" "C-g" "<left>" "<right>" "<up>" "<down>" "<prior>" "<next>" "<delete>"))
+
+
 ;;★★2.6 Programming Languages
 ;;★★★ Python and Conda 
 ;; Decide to switch to virtualenv (Later)
@@ -610,7 +628,7 @@
   ;; Note: they inherit from outline-X faces (see outline mode section)
   (dolist (face '((org-level-1 . 1.2)
                   (org-level-2 . 1.1)
-                  (org-level-3 . 1.0)
+                  (org-level-3 . 1.05)
                   (org-level-4 . 1.0)
                   (org-level-5 . 1.0)
                   (org-level-6 . 1.0)
@@ -702,10 +720,35 @@
   ;;e.g., <s ==> script
   ;;<q ==> quote
   (require 'org-tempo)
-  )
+  );;end of use-package org
 
 
-;;★★★ Org-agenda and TODO options
+
+;;★★★ Org-agenda better looking and TODO options
+
+  ;;make org agenda looks better
+  (setq org-agenda-span 'day
+	;; this can keep the agenda clean, but may ignore some tasks with close deadline
+	;; org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled
+      	org-agenda-current-time-string " ← NOW ───🔔───"
+	org-agenda-time-grid '((daily today require-timed) (800 2200) "  ←-" "----------")
+	)
+
+  (setq org-agenda-prefix-format '(
+	(agenda . " %-12:c %?-12t % s")
+	(todo . " %i %-12:c")
+	(tags . " %i %-12:c")
+	(search . " %i %-12:c"))
+	)
+
+  ;;hide all places tags?
+  ;;(setq org-agenda-hide-tags-regexp "@.*")
+  ;; tried to set icon org-agenda-category-icon-alist, but failed.
+  ;; (setq org-agenda-category-icon-alist
+  ;;       '(("WorkFor💰" (list ...) nil nil :ascent center )
+  ;; 	  )
+  ;; 	)
+
   ;;org-agenda
   ;;Use the dropbox as a reference point for all the useful files.
   (setq org-agenda-files
@@ -725,8 +768,9 @@
      ;;active and deactive is for repeated tasks/plans
     '((sequence "ACTIVE(a)" "|" "ONE(z)" "DEACTIVE(e@)") ;;use this for repeat tasks/habits
       (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")  ;; small or subtasks
-      (sequence "WAIT(w@/!)" "HOLD(h@)" "WANTTODO(o)" "PLAN(p)" "READY(r)" "CURRENT(u)" "REVIEW(v)" "|" "COMPLETED(c!)" "NOGOOD(g@)" "CANCELED(k@)"))) ;;big projects
-
+      (sequence "WAIT(w@/!)" "HOLD(h@)" "WANTTODO(o)" "PLAN(p)" "READY(r)" "CURRENT(u)" "REVIEW(v)" "|" "COMPLETED(c!)" "NOGOOD(g@)" "CANCELED(k@)") ;;big projects
+      ))
+      
   (setq org-todo-keyword-faces
       '(("WANTTODO" . (:foreground "GoldenRod" :weight bold))
         ("PLAN" . (:foreground "IndianRed1" :weight bold))
@@ -755,25 +799,32 @@
   ;; Create my own tags
   (setq org-tag-alist
     '((:startgroup)
-       ; Put mutually exclusive tags here
-      (:endgroup)
+      ; Put mutually exclusive tags here
+      
       ;; Places
       ("@medical" . ?M)
       ("@home" . ?H)
-      ("@work" . ?W)
-
+      ("@company" . ?W)
+      ("@outside" . ?O)
+      ("@anywhere" . ?A)
+      
+      (:endgroup)
+     
       ;; Activities
       ("planning" . ?n)
-      ("readAndLearn" . ?r)
+      ("readAndLrn" . ?r)
       ("writing" . ?w)
-      ("programming" . ?p)
-      ("labExperiment" . ?l)
+      ("programing" . ?p)
+      ("labExprment" . ?l)
       ("creative" . ?c)
       ("email" . ?e)
       ("callOrMeet" . ?m)
       ("presenting" . ?s)
-      ("submitOrUpload" . ?u)
-      ("discussInMeet" . ?d)
+      ("sbmitOrUpld" . ?u)
+      ("discssInMet" . ?d)
+      ("payOrBuy" . ?a)
+      ("funfunfun" . ?f)
+      ("handyman" . ?h)
       ))
 
   ;; Configure custom agenda views
@@ -824,6 +875,32 @@
       (todo "CANCELED"
             ((org-agenda-overriding-header "Cancelled Projects")
              (org-agenda-files org-agenda-files)))))))
+
+;;★★★ Org-super agenda (not used)
+  ;; (use-package org-super-agenda
+  ;;   :after org
+  ;;   :config
+  ;;   (setq org-super-agenda-groups
+  ;;      '(;; Each group has an implicit boolean OR operator between its selectors.
+  ;;        (:name "❗ Overdue "  ; Optionally specify section name
+  ;;               :deadline past
+  ;;               :order 2
+  ;;               :face 'error)
+
+  ;;        (:name "Working "
+  ;;               :category "WorkFor🍲"
+  ;;               :order 3)
+
+  ;;        (:name " Today "  ; Optionally specify section name
+  ;;               :time-grid t
+  ;;               :date today
+  ;;               :scheduled today
+  ;;               :order 1
+  ;;               :face 'warning)
+
+  ;; 	  ))
+  ;;   (org-super-agenda-mode t)
+  ;;   )
 
 ;;★★★ Org-capture templates
   ;; Org capture templates
@@ -947,12 +1024,13 @@
   )
 
 (defun gy/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
+  (setq visual-fill-column-width 112
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 ;;let org mode display in the center of the screen
 (use-package visual-fill-column
   :hook (org-mode . gy/org-mode-visual-fill))
+
 
 ;;★★★ Org-roam Note!!
 
@@ -1013,8 +1091,8 @@
   (setq org-id-extra-files (org-roam--list-files org-roam-directory))
   (org-roam-db-autosync-mode))
 
-;;Control the display of org roam buffer
-(add-to-list 'display-buffer-alist
+  ;;Control the display of org roam buffer
+  (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"
                (display-buffer-in-side-window)
                (side . right)
