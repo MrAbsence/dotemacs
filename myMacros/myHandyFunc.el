@@ -1,3 +1,8 @@
+;; -*- lexical-binding: t; -*-
+
+;; -----------------------------------------------------------------------------
+;; Personal settings
+;; -----------------------------------------------------------------------------
 (defun gy/restore-my-nine-tabs ()
   "If some error happens, the desktop file may not work. Thus, need to restore my tabs."
   (interactive)
@@ -8,22 +13,19 @@
       (tab-bar-rename-tab (nth i tab-names)))) ; Rename tab with corresponding name
   )
 
-;; As the name delete this buffer's file
-;; based on http://emacsredux.com/blog/2013/04/03/delete-file-and-buffer/
-(defun delete-file-and-buffer ()
-  "Kill the current buffer and deletes the file it is visiting."
+
+;; TODO, then switch projects?
+(defun gy/conda-activate-mypycal ()
+  "conda activate path to mypycal"
   (interactive)
-  (let ((filename (buffer-file-name)))
-    (if filename
-        (if (y-or-n-p (concat "Do you really want to delete file " filename " ?"))
-            (progn
-              (delete-file filename)
-              (message "Deleted file %s." filename)
-              (kill-buffer)))
-      (message "Not a file visiting buffer!"))))
+  (conda-env-activate-path (expand-file-name "~/mypycal"))
+  )
 
+;; -----------------------------------------------------------------------------
+;; Org mode, agenda, task related
+;; -----------------------------------------------------------------------------
 
-
+;; Delete some unnecessary columns in clock table
 (defun gy/journal-clocktable-write (&rest args)
   "Custom clocktable writer.
    Uses the default writer but shifts the first column right."
@@ -34,23 +36,6 @@
     (org-table-next-field)
     (org-table-delete-column)
     ))
-
-(defun insdate-insert-current-date (&optional omit-day-of-week-p)
-    "Insert today's date using the current locale.
-     With a prefix argument, the date is inserted without the day of
-     the week."
-    (interactive "P*")
-    (insert (calendar-date-string (calendar-current-date) nil
-				  omit-day-of-week-p)))
-
-(defun my-buffer-local-set-key (key command)
-  (interactive "KSet key buffer-locally: \nCSet key %s buffer-locally to command: ")
-  (let ((oldmap (current-local-map))
-        (newmap (make-sparse-keymap)))
-    (when oldmap
-      (set-keymap-parent newmap oldmap))
-    (define-key newmap key command)
-    (use-local-map newmap)))
 
 ;; generate file name for week journal
 ;; example: 2022-0913-W33.org. The date is the Monday of the week.
@@ -67,11 +52,6 @@
 	(org-read-date nil t "++1" nil (org-read-date nil t "-Sun")))
       nil) "-WeekJournal.org"))
 
-(defun gy/buffer-whole-string-by-buffername (buffer)
-  (with-current-buffer buffer
-    (save-restriction
-      (widen)
-      (buffer-substring (point-min) (point-max)))))
 
 ;; display inline image right at point
 ;; one image at a time
@@ -95,6 +75,7 @@
 ;;TO MY SURPRISE, IT WORKS!!!
 
 ;; Bind this to C-c n I in org-roam settings
+;; From system crafters
 (defun org-roam-node-insert-immediate (arg &rest args)
   (interactive "P")
   (let ((args (cons arg args))
@@ -102,15 +83,98 @@
                                                   '(:immediate-finish t)))))
     (apply #'org-roam-node-insert args)))
 
+;; The buffer you put this code in must have lexical-binding set to t!
+;; See the final configuration at the end for more details.
+
+(defun gy/org-roam-filter-by-tag (tag-name)
+  (lambda (node)
+    (member tag-name (org-roam-node-tags node))))
+
+(defun gy/org-roam-list-notes-by-tag (tag-name)
+  (mapcar #'org-roam-node-file
+          (seq-filter
+           (gy/org-roam-filter-by-tag tag-name)
+           (org-roam-node-list))))
+
+(defun gy/org-roam-refresh-agenda-list ()
+  (interactive)
+  (setq org-agenda-files (delete-dups (append org-agenda-files (gy/org-roam-list-notes-by-tag "Project")))))
+;; I add delete duplicates here to ensure it does not add files more than once, if you run it more than once in Emacs
+
+(defun gy/org-roam-project-finalize-hook ()
+  "Adds the captured project file to `org-agenda-files' if the
+capture was not aborted."
+  ;; Remove the hook since it was added temporarily
+  (remove-hook 'org-capture-after-finalize-hook #'gy/org-roam-project-finalize-hook)
+
+  ;; Add project file to the agenda list if the capture was confirmed
+  (unless org-note-abort
+    (with-current-buffer (org-capture-get :buffer)
+      (add-to-list 'org-agenda-files (buffer-file-name)))))
+
+(defun gy/org-roam-find-project ()
+  (interactive)
+  ;; Add the project file to the agenda after capture is finished
+  (add-hook 'org-capture-after-finalize-hook #'gy/org-roam-project-finalize-hook)
+
+  ;; Select a project file to open, creating it if necessary
+  (org-roam-node-find
+   nil
+   nil
+   (gy/org-roam-filter-by-tag "Project")
+   nil
+   :templates
+   '(("p" "project" plain (function (lambda () (gy/file-to-string-by-filename (expand-file-name "MyNotes/Templates/ProjectTemplate.org" gy-dropbox-location))))
+      :if-new (file+head "@Inbox/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: Project\n#+filetags: Project\n#+date: %U\n\n")
+      :unnarrowed t))))
+
+;; (global-set-key (kbd "C-c n p") #'gy/org-roam-find-project)
+
+;; -----------------------------------------------------------------------------
+;; Emacs, buffer basic functions
+;; -----------------------------------------------------------------------------
+
+
+;; As the name delete this buffer's file
+;; based on http://emacsredux.com/blog/2013/04/03/delete-file-and-buffer/
+(defun delete-file-and-buffer ()
+  "Kill the current buffer and deletes the file it is visiting."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (if filename
+        (if (y-or-n-p (concat "Do you really want to delete file " filename " ?"))
+            (progn
+              (delete-file filename)
+              (message "Deleted file %s." filename)
+              (kill-buffer)))
+      (message "Not a file visiting buffer!"))))
+
 (defun gy/file-to-string-by-filename (filename)
   "File to string function"
   (with-temp-buffer
     (insert-file-contents filename)
     (buffer-string)))
 
-;; TODO, then switch projects?
-(defun gy/conda-activate-mypycal ()
-  "conda activate path to mypycal"
-  (interactive)
-  (conda-env-activate-path (expand-file-name "~/mypycal"))
-  )
+(defun gy/buffer-whole-string-by-buffername (buffer)
+  (with-current-buffer buffer
+    (save-restriction
+      (widen)
+      (buffer-substring (point-min) (point-max)))))
+
+(defun insdate-insert-current-date (&optional omit-day-of-week-p)
+    "Insert today's date using the current locale.
+     With a prefix argument, the date is inserted without the day of
+     the week."
+    (interactive "P*")
+    (insert (calendar-date-string (calendar-current-date) nil
+				  omit-day-of-week-p)))
+
+
+(defun my-buffer-local-set-key (key command)
+  (interactive "KSet key buffer-locally: \nCSet key %s buffer-locally to command: ")
+  (let ((oldmap (current-local-map))
+        (newmap (make-sparse-keymap)))
+    (when oldmap
+      (set-keymap-parent newmap oldmap))
+    (define-key newmap key command)
+    (use-local-map newmap)))

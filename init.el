@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 ;;; init.el --- Mrabsence's emacs config
 ;;; Cool things start here!----------------------------------------
 ;;; Thanks to https://www.youtube.com/@SystemCrafters
@@ -26,6 +27,7 @@
 ;; I also want to load some handy functions
 (setq my-handy-function-file (locate-user-emacs-file "myMacros/myHandyFunc.el"))
 (load my-handy-function-file 'noerror 'nomessage)
+
 
 ;;★★ Windows, MSYS2 specific settings
 ;; on Windows, more specifically, MSYS2 system,
@@ -292,6 +294,11 @@
 ;; Use "(" to hide/show the details of dired
 ;; Dired related packages are in Packages
 
+;; So it it default to hide details
+(add-hook 'dired-mode-hook
+      (lambda ()
+        (dired-hide-details-mode)
+        ))
 
 ;;★★★ webjump
 (require 'webjump)
@@ -761,7 +768,7 @@
   ;;track my habits
   (require 'org-habit)
   (add-to-list 'org-modules 'org-habit)
-  (setq org-habit-graph-column 30)
+  (setq org-habit-graph-column 20)
 
   ;;TODO: modify keywords and their colors
   (setq org-todo-keywords
@@ -840,7 +847,7 @@
      ((todo "NEXT|READY"
         ((org-agenda-overriding-header "Next Tasks")))))
 
-    ("W" "Work Tasks" tags-todo "+work")
+    ("W" "Work Tasks" tags-todo "+company")
 
     ;; Low-effort next actions
     ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
@@ -1010,6 +1017,9 @@
 ;; For wolfram-mode (but this is not defined?)
 ;; (setq mathematica-command-line "mash")
 
+;; (setq org-src-block-faces
+;;         '(("emacs-lisp" (:background "#EEE2FF"))
+;;           ("python" (:background "#e5ffb8"))))
 
 ;;★★★ Other org packages
 
@@ -1064,14 +1074,14 @@
       :unnarrowed t)
      ;;Finally got the template function work!
      ("p" "project" plain (function (lambda () (gy/file-to-string-by-filename (expand-file-name "MyNotes/Templates/ProjectTemplate.org" gy-dropbox-location))))
-      :if-new (file+head "@Inbox/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Project\n#+date: %U\n\n")
+      :if-new (file+head "@Inbox/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: Project\n#+filetags: Project\n#+date: %U\n\n")
       :unnarrowed t)
 
      ("l" "literature" plain (function (lambda () (gy/file-to-string-by-filename (expand-file-name "MyNotes/Templates/LiteratureTemplate.org" gy-dropbox-location))))
       :if-new (file+head "30-Resources/!Literatures!/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Literature\n\n")
       :unnarrowed t)
 
-     ("c" "source code" plain (function (lambda () (gy/file-to-string-by-filename (expand-file-name "MyNotes/Templates/SourceCodeTemplate.org" gy-dropbox-location))))
+     ("s" "source code" plain (function (lambda () (gy/file-to-string-by-filename (expand-file-name "MyNotes/Templates/SourceCodeTemplate.org" gy-dropbox-location))))
       :if-new (file+head "30-Resources/Linux-Programming-Knowledge/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: SourceCode\n\n")
       :unnarrowed t)
      ;;TODO: add book here. add experiment here.
@@ -1081,6 +1091,7 @@
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
 	 ("C-c n I" . org-roam-node-insert-immediate)
+	 ("C-c n p" . gy/org-roam-find-project)
          :map org-mode-map
          ("C-M-i"    . completion-at-point))
   
@@ -1100,6 +1111,10 @@
                (window-width . 0.35)
                (window-parameters . ((no-other-window . t)
                                      (no-delete-other-windows . t)))))
+
+;; Build the agenda list the first time for the session
+(gy/org-roam-refresh-agenda-list)
+
 
 ;;★★2.8 Old or not-used or not-working functions/packages
 
