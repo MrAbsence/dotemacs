@@ -18,7 +18,7 @@
       (and
        (derived-mode . text-mode)
        (not
-	(starred-name))))
+        (starred-name))))
      ("TeX"
       (or
        (derived-mode . tex-mode)
@@ -43,20 +43,20 @@
        (mode . gnus-summary-mode)
        (mode . gnus-article-mode)))))
  '(package-selected-packages
-   '(rime gnugo gnu-elpa-keyring-update magit counsel-projectile projectile bind-key dired-preview erc xref idlwave eglot eldoc faceup flymake jsonrpc org project soap-client tramp verilog-mode elfeed python-mode seq org-inline-anim deadgrep wolfram-mode org-contrib conda compat yasnippet all-the-icons-dired emacsql org-roam ace-window visual-fill-column org-bullets helpful counsel which-key rainbow-delimiters doom-themes all-the-icons doom-modeline ivy use-package))
+   '(htmlize rime gnugo gnu-elpa-keyring-update magit counsel-projectile projectile bind-key dired-preview erc xref idlwave eglot eldoc faceup flymake jsonrpc org project soap-client tramp verilog-mode elfeed python-mode seq org-inline-anim deadgrep wolfram-mode org-contrib conda compat yasnippet all-the-icons-dired emacsql org-roam ace-window visual-fill-column org-bullets helpful counsel which-key rainbow-delimiters doom-themes all-the-icons doom-modeline ivy use-package))
  '(safe-local-variable-values
    '((eval my-buffer-local-set-key
-	   (kbd "M-<up>")
-	   'outline-move-subtree-up)
+           (kbd "M-<up>")
+           'outline-move-subtree-up)
      (eval my-buffer-local-set-key
-	   (kbd "M-<down>")
-	   'outline-move-subtree-down)
+           (kbd "M-<down>")
+           'outline-move-subtree-down)
      (eval my-buffer-local-set-key
-	   (kbd "C-c C-c")
-	   'outline-hide-entry)
+           (kbd "C-c C-c")
+           'outline-hide-entry)
      (eval when
-	   (fboundp 'gy/gyinit-setup)
-	   (gy/gyinit-setup)))))
+           (fboundp 'gy/gyinit-setup)
+           (gy/gyinit-setup)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

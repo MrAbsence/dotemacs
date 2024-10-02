@@ -48,8 +48,8 @@
   (concat path
     (format-time-string "%Y-%m%d-W%V"
       (if (or org-overriding-default-time (equal current-prefix-arg 1))
-	(org-read-date nil t nil "Could you select the Monday for filename: ")
-	(org-read-date nil t "++1" nil (org-read-date nil t "-Sun")))
+        (org-read-date nil t nil "Could you select the Monday for filename: ")
+        (org-read-date nil t "++1" nil (org-read-date nil t "-Sun")))
       nil) "-WeekJournal.org"))
 
 
@@ -128,7 +128,41 @@ capture was not aborted."
       :if-new (file+head "@Inbox/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: Project\n#+filetags: Project\n#+date: %U\n\n")
       :unnarrowed t))))
 
+;; This key binding is set in init.el Org-roam section
 ;; (global-set-key (kbd "C-c n p") #'gy/org-roam-find-project)
+
+
+(defun gy/org-copy-todo-to-today ()
+  (interactive)
+  (let ((org-refile-keep t) ;; Set this to nil to delete the original!
+
+        (org-capture-templates
+         '(
+           ("j" "Journal Entries")
+      ;; Usually, the journal is for current time.
+      ;; But if you want to journal for a different time (e.g., tomorrow), use "C-1 C-C j ...."!!!
+           ("jt" "Today Task" plain
+            (file+olp+datetree (lambda () (gy/capture-add-week-to-journalname (expand-file-name "MyNotes/90-DayPlanner/" gy-dropbox-location))))
+           ""
+           :immediate-finish t
+           :tree-type week
+           )
+           ))
+
+        (org-after-refile-insert-hook #'save-buffer)
+        today-file
+        pos)
+    (save-window-excursion
+      (org-capture-goto-target "jt")
+      (setq today-file (gy/capture-add-week-to-journalname (expand-file-name "MyNotes/90-DayPlanner/" gy-dropbox-location)))
+      (setq pos (point))
+      ;;(print pos) ;;For debug
+      )
+
+    (if (eq major-mode 'org-agenda-mode)
+        (org-agenda-refile nil (list "TodayTasks" today-file nil pos) nil)
+        (org-refile nil nil (list "TodayTasks" today-file nil pos)))
+    ))
 
 ;; -----------------------------------------------------------------------------
 ;; Emacs, buffer basic functions
@@ -167,7 +201,7 @@ capture was not aborted."
      the week."
     (interactive "P*")
     (insert (calendar-date-string (calendar-current-date) nil
-				  omit-day-of-week-p)))
+                                  omit-day-of-week-p)))
 
 
 (defun my-buffer-local-set-key (key command)

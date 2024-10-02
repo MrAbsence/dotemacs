@@ -44,14 +44,18 @@
 ;; Emacs on WSL open links in Windows web browser
 ;; Teach Emacs how to open links in your default Windows browser
 
+(setq IS-WSL nil)
 (let ((wsl-cmd-exe "/mnt/c/Windows/System32/cmd.exe")
-	(wsl-cmd-c-args '("/c" "start" "")))
+        (wsl-cmd-c-args '("/c" "start" "")))
     (when (file-exists-p wsl-cmd-exe)
       (setq browse-url-generic-program  wsl-cmd-exe
-	    browse-url-generic-args     wsl-cmd-c-args
-	    browse-url-browser-function 'browse-url-generic
-	    search-web-default-browser 'browse-url-generic)))
+            browse-url-generic-args     wsl-cmd-c-args
+            browse-url-browser-function 'browse-url-generic
+            search-web-default-browser 'browse-url-generic
+            IS-WSL 't)))
 
+;; Another WSL specific setting is about the default apps for link to files
+;; see org mode setup
 
 ;;★1 Some basic settings of editor
 
@@ -92,7 +96,7 @@
 
 ;;this function does not work here? fixed.
 (tab-bar-mode 1)
-(global-set-key (kbd "H-t") 'tab-bar-mode)
+(global-set-key (kbd "H-<tab>") 'tab-bar-mode)
 
 ;;★★★ ibuffer and its display format
 ;;----------------------------------------------------------------
@@ -167,6 +171,8 @@
 (add-to-list 'default-frame-alist '(mouse-color . "white"))
 
 ;;★★★ Auto save back-up files
+;;Auto-save-mode is enabled by default
+;;Note this is saveing file to backup file not the visited file
 ;;set auto save interval in seconds
 (setq-default auto-save-visited-interval 0)
 
@@ -191,7 +197,7 @@
 ;; Revert Dired and other buffers
 (setq global-auto-revert-non-file-buffers t)
 
-;;★★★ Show line numbers and column numbers
+;;★★★ Show line numbers and some other things
 ;; show line numbers and col numbers in some modes
 (column-number-mode)
 ;; Enable line numbers for some modes
@@ -202,11 +208,16 @@
 
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
-		term-mode-hook
-		shell-mode-hook
-		eshell-mode-hook))
+                term-mode-hook
+                shell-mode-hook
+                eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
+(setq whitespace-style '(face tabs spaces trailing space-before-tab newline indentation empty space-after-tab space-mark tab-mark newline-mark missing-newline-at-eof))
+
+;;★★★ White space indentation and TAB key
+(setq-default indent-tabs-mode nil)
+(setq tab-always-indent 'complete)
 
 ;;★★★ default font and font size
 ;; This line works well in Win32
@@ -221,9 +232,9 @@
                     :height 155)
 
 (set-face-attribute 'variable-pitch nil
-		    :font "Cantarell"
-		    :weight 'regular
-		    :height 155)
+                    :font "Cantarell"
+                    :weight 'regular
+                    :height 155)
 
 ;;★★★ How does Emacs window looks like (see doom theme package)
 ;; General emacs views--------------------------------------------
@@ -314,7 +325,7 @@
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("elpa" . "https://elpa.gnu.org/packages/")
-			 ("elpanongnu" . "https://elpa.nongnu.org/nongnu/")))
+                         ("elpanongnu" . "https://elpa.nongnu.org/nongnu/")))
 
 ;;★★★ gnupg key bug fix
 ;; this line will not work on linux/iOS system
@@ -323,7 +334,7 @@
 ;;★★★ Package initialize
 (package-initialize)
 (unless package-archive-contents
- (package-refresh-contents))
+  (package-refresh-contents))
 
 ;;★★★ install use-package on non-Linux platforms
 
@@ -395,8 +406,8 @@
  :ensure t
  :init (doom-modeline-mode 1)
  :custom ((doom-modeline-height 30)
-	  (doom-modeline-time-icon nil)
-	  (doom-modeline-workspace-name nil))
+          (doom-modeline-time-icon nil)
+          (doom-modeline-workspace-name nil))
  
 )
 
@@ -431,10 +442,10 @@
 ;; It was loaded in ivy. Here is some config
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
-	 ("C-x b" . counsel-switch-buffer) ;; can use C-d to kill buffer, M-o to operate
-	 ("C-x C-f" . counsel-find-file)
-	 :map minibuffer-local-map
-	 ("C-r" . 'counsel-minibuffer-history)))
+         ("C-x b" . counsel-switch-buffer) ;; can use C-d to kill buffer, M-o to operate
+         ("C-x C-f" . counsel-find-file)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history)))
 
 ;; Use ivy for completion
 ;; How to run ivy?
@@ -442,14 +453,14 @@
 (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
-	 ("C-r" . swiper-backward)
+         ("C-r" . swiper-backward)
          :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)	
+         ("TAB" . ivy-alt-done)         
          ("C-l" . ivy-alt-done)
          ("C-j" . ivy-next-line)
          ("C-k" . ivy-previous-line)
          :map ivy-switch-buffer-map
-	 ("C-l" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
          ("C-k" . ivy-previous-line)
          ("C-d" . ivy-switch-buffer-kill)
          :map ivy-reverse-i-search-map
@@ -481,18 +492,18 @@
   :bind
   (:map yas-minor-mode-map
         ("<menu>" . yas-expand) ;; now <menu> key do the work
-	("<f9>" . yas-expand) ;; in case you don't have <menu> key
+        ("<f9>" . yas-expand) ;; in case you don't have <menu> key
         ([(tab)] . nil) ;; tab nolonger works for yasnippet
         ("TAB" . nil)
    :map yas-keymap
-	([(tab)] . nil)
-	("TAB" . nil)
-	([(shift tab)] . nil)
-	([backtab] . nil)
-	("<menu>" . yas-next-field)
-	("<f9>" . yas-next-field)
-	("S-<menu>" . yas-prev-field)
-	("S-<f9>" . yas-prev-field))
+        ([(tab)] . nil)
+        ("TAB" . nil)
+        ([(shift tab)] . nil)
+        ([backtab] . nil)
+        ("<menu>" . yas-next-field)
+        ("<f9>" . yas-next-field)
+        ("S-<menu>" . yas-prev-field)
+        ("S-<f9>" . yas-prev-field))
   :config
   (setq yas-snippet-dirs '("~/.emacs.d/mySnippets"))
   ;; So this directory should be part of my config
@@ -543,7 +554,7 @@
   :config
   (setq elfeed-feeds
         '(("https://semiengineering.com/feed/" magzine semiconduct)
-	  	  ))
+                  ))
   ;;(setq-default elfeed-search-filter "@2-week-ago +unread ")
   )
 
@@ -562,7 +573,7 @@
   :bind
   (:map dired-mode-map
         ("H-p" . dired-preview-mode) ;; <f6> then p
-	)
+        )
   :config
   (setq dired-preview-delay 0.5)
   (setq dired-preview-max-size (expt 2 20))
@@ -674,7 +685,7 @@
   ;; make org mode pretty
   ;; make the collapse sign available for bold font
   (setq org-ellipsis "⤵"
-	org-hide-emphasis-markers t)
+        org-hide-emphasis-markers t)
   ;;for super/supscript display or export
   (setq org-pretty-entities t)
   (setq org-use-sub-superscripts "{}")
@@ -684,19 +695,32 @@
   (add-to-list 'org-emphasis-alist
              '("~" (:foreground "red" :weight bold)
                ))
-  
+
   ;;using default apps to open links
   ;;add other files if it is necessary
-  (setq org-file-apps
-     '(("\\.docx?\\'" . default)
-       ("\\.xlsx?\\'" . default)
-       ("\\.pptx?\\'" . default)
-      ("\\.mm\\'" . default)
-      ("\\.x?html?\\'" . default)
-      ("\\.pdf\\'" . default)
-      (auto-mode . emacs)
-      (directory . emacs)))
-  
+  ;;when in WSL, use the windows default apps for some types of files
+  (if IS-WSL ;; this is my IS-WSL-p
+      ;; if it is real WSL Emacs
+      (setq org-file-apps '((remote . emacs)
+                        (auto-mode . emacs)
+                        (directory . emacs)
+                        ("\\.mm\\'" . "wslview \"%s\"")
+                        ("\\.x?html?\\'" . "wslview \"%s\"")
+                        ("\\.pptx?\\'" . "wslview \"%s\"")
+                        ("\\.xlsx?\\'" . "wslview \"%s\"")
+                        ("\\.docx?\\'" . "wslview \"%s\"")
+                        ("\\.pdf\\'" .  "wslview \"%s\"")))
+      ;; if it is Windows Emacs
+      (setq org-file-apps '(("\\.docx?\\'" . default)
+                        ("\\.xlsx?\\'" . default)
+                        ("\\.pptx?\\'" . default)
+                        ("\\.mm\\'" . default)
+                        ("\\.x?html?\\'" . default)
+                        ("\\.pdf\\'" . default)
+                        (auto-mode . emacs)
+                        (directory . emacs)
+                        (remote . emacs))))
+
   ;;define a 0-width character in different system
   ;;it is helpful if you want to use superscript at the start of line/word, e.g. zwsp^{13}C
   (add-to-list 'org-entities-user
@@ -735,35 +759,40 @@
 
   ;;make org agenda looks better
   (setq org-agenda-span 'day
-	;; this can keep the agenda clean, but may ignore some tasks with close deadline
-	;; org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled
-      	org-agenda-current-time-string " ← NOW ───🔔───"
-	org-agenda-time-grid '((daily today require-timed) (800 2200) "  ←-" "----------")
-	)
+        ;;When nil, the deadline is still shown "on the dead day" and should give you a happy feeling.
+        ;;I dont want to be happy.
+        org-agenda-skip-deadline-if-done t
+        org-agenda-skip-scheduled-if-done t
+        ;; this can keep the agenda clean, but may ignore some tasks with close deadline
+        ;; if a task is scheduled, then it only shows the deadline if it is in 7 days
+        org-agenda-skip-deadline-prewarning-if-scheduled 7
+        org-agenda-current-time-string " ← NOW ───🔔───"
+        org-agenda-time-grid '((daily today require-timed) (800 2200) "  ←-" "----------")
+        )
 
   (setq org-agenda-prefix-format '(
-	(agenda . " %-12:c %?-12t % s")
-	(todo . " %i %-12:c")
-	(tags . " %i %-12:c")
-	(search . " %i %-12:c"))
-	)
+        (agenda . " %-12:c %?-12t % s")
+        (todo . " %i %-12:c")
+        (tags . " %i %-12:c")
+        (search . " %i %-12:c"))
+        )
 
   ;;hide all places tags?
   ;;(setq org-agenda-hide-tags-regexp "@.*")
   ;; tried to set icon org-agenda-category-icon-alist, but failed.
   ;; (setq org-agenda-category-icon-alist
   ;;       '(("WorkFor💰" (list ...) nil nil :ascent center )
-  ;; 	  )
-  ;; 	)
+  ;;      )
+  ;;    )
 
   ;;org-agenda
   ;;Use the dropbox as a reference point for all the useful files.
   (setq org-agenda-files
-	(list (expand-file-name "MyNotes/80-GTDTasks/MyTasks.org" gy-dropbox-location)
-	  (expand-file-name "MyNotes/40-Archives/TaskArchive.org" gy-dropbox-location)
-	  (expand-file-name "MyNotes/80-GTDTasks/HabitsOrLongTasks.org" gy-dropbox-location)
-	  (expand-file-name "MyNotes/80-GTDTasks/MyReadingList.org" gy-dropbox-location)))
-  
+        (list (expand-file-name "MyNotes/80-GTDTasks/MyTasks.org" gy-dropbox-location)
+          (expand-file-name "MyNotes/40-Archives/TaskArchive.org" gy-dropbox-location)
+          (expand-file-name "MyNotes/80-GTDTasks/HabitsOrLongTasks.org" gy-dropbox-location)
+          (expand-file-name "MyNotes/80-GTDTasks/MyReadingList.org" gy-dropbox-location)))
+
 
   ;;track my habits
   (require 'org-habit)
@@ -777,30 +806,38 @@
       (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")  ;; small or subtasks
       (sequence "WAIT(w@/!)" "HOLD(h@)" "WANTTODO(o)" "PLAN(p)" "READY(r)" "CURRENT(u)" "REVIEW(v)" "|" "COMPLETED(c!)" "NOGOOD(g@)" "CANCELED(k@)") ;;big projects
       ))
-      
+
   (setq org-todo-keyword-faces
       '(("WANTTODO" . (:foreground "GoldenRod" :weight bold))
         ("PLAN" . (:foreground "IndianRed1" :weight bold))
         ("TODO" . (:foreground "IndianRed1" :weight bold))
         ("WAIT" . (:foreground "coral" :weight bold))
         ("READY" . (:foreground "OrangeRed" :weight bold))
-	("NEXT" . (:foreground "OrangeRed" :weight bold))
+        ("NEXT" . (:foreground "OrangeRed" :weight bold))
         ("CURRENT" . (:foreground "LimeGreen" :weight bold))
         ("REVIEW" . (:foreground "LimeGreen" :weight bold))
-	("NOGOOD" . (:foreground "red" :weight bold))
-	))
+        ("NOGOOD" . (:foreground "red" :weight bold))
+        ))
 
   ;; refile tasks
   ;; maybe add some refile files for quick notes?
   ;; BTW, I learned how to use cons in this section!
   (setq org-refile-targets
-    (list (cons (expand-file-name "MyNotes/40-Archives/TaskArchive.org" gy-dropbox-location) (cons :maxlevel 1)) ; this is task archive
-	  (cons (expand-file-name "MyNotes/80-GTDTasks/MyTasks.org" gy-dropbox-location) (cons :maxlevel 1))))
+        (list
+         '(nil :maxlevel . 3)
+         (cons (expand-file-name "MyNotes/40-Archives/TaskArchive.org" gy-dropbox-location) (cons :maxlevel 1)) ; this is task archive
+          (cons (expand-file-name "MyNotes/80-GTDTasks/MyTasks.org" gy-dropbox-location) (cons :maxlevel 1))))
   ;; !!in case the task was created somewhere else. Use M-w to copy task.
 
+  (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+  (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+
   ;; Save Org buffers after refiling!
-  (advice-add 'org-refile :after 'org-save-all-org-buffers)
-  ;; Also save org files after remote edits
+  ;; I feel it is not necessary
+  ;; Also, it cause an error for gy/copy task to today
+  ;;(advice-add 'org-refile :after 'org-save-all-org-buffers)
+
+;; Also save org files after remote edits
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
 
   ;; Create my own tags
@@ -837,7 +874,8 @@
   ;; Configure custom agenda views
   ;; Should rewrite this someday
   (setq org-agenda-custom-commands
-   '(("d" "Dashboard"
+        '(
+    ("d" "Dashboard"
      ((agenda "" ((org-deadline-warning-days 12)))
       (todo "NEXT|READY"
         ((org-agenda-overriding-header "Next Tasks")))
@@ -905,7 +943,7 @@
   ;;               :order 1
   ;;               :face 'warning)
 
-  ;; 	  ))
+  ;;      ))
   ;;   (org-super-agenda-mode t)
   ;;   )
 
@@ -924,20 +962,27 @@
            (file+olp+datetree (lambda () (gy/capture-add-week-to-journalname (expand-file-name "MyNotes/90-DayPlanner/" gy-dropbox-location))))
            "\n* %<%I:%M %p> - %? :journal:\n\n\n"
            :clock-in :clock-resume
-           :empty-lines 1)
+           :empty-lines 1
+           :tree-type week)
+
       ("jm" "Meeting" entry
            (file+olp+datetree (lambda () (gy/capture-add-week-to-journalname (expand-file-name "MyNotes/90-DayPlanner/" gy-dropbox-location))))
            "\n* %<%I:%M %p> - %^{prompt|GroupMeeting} :meetings:\n\n%?\n\n"
            :clock-in :clock-resume
-           :empty-lines 1)
+           :empty-lines 1
+           :tree-type week)
+
+      ;; This ja used to copy a screen shot of agenda into weekly journal
       ("ja" "Agenda Output" entry
            (file+olp+datetree (lambda () (gy/capture-add-week-to-journalname (expand-file-name "MyNotes/90-DayPlanner/" gy-dropbox-location))))
            "\n* %<%I:%M %p> - Org Agenda :journal:\n\n#+begin_src\n%(gy/buffer-whole-string-by-buffername \"*Org Agenda*\")\n#+end_src\n%?\n"
-           :empty-lines 1)
+           :empty-lines 1
+           :tree-type week)
 
       ("w" "Workflows")
       ("we" "Checking Email" entry (file+olp+datetree  (lambda () (gy/capture-add-week-to-journalname (expand-file-name "MyNotes/90-DayPlanner/" gy-dropbox-location))))
-           "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+       "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1
+           :tree-type week)
 
       ("m" "Metrics Capture")
       ("mw" "Weight" table-line (file+headline (lambda () (expand-file-name "MyNotes/90-DayPlanner/Metrics.org" gy-dropbox-location)) "Weight")
@@ -954,10 +999,10 @@
 
   ;; shortcut for figure directory
   (setq org-link-abbrev-alist
-	(list (cons "figdir" (expand-file-name "MyNotes/99-figures/" gy-dropbox-location))
-	      (cons "notedir" (expand-file-name "MyNotes/" gy-dropbox-location))
-	      (cons "wprojects" (expand-file-name "MyNotes/10-Projects/Work-M/" gy-dropbox-location)) ;; this path will only work on my work laptop!!! Should be edited based on the work path
-	      ))
+        (list (cons "figdir" (expand-file-name "MyNotes/99-figures/" gy-dropbox-location))
+              (cons "notedir" (expand-file-name "MyNotes/" gy-dropbox-location))
+              (cons "wprojects" (expand-file-name "MyNotes/10-Projects/Work-M/" gy-dropbox-location)) ;; this path will only work on my work laptop!!! Should be edited based on the work path
+              ))
 
 ;;★★★ Org-babel and mathematica
 ;; My favorate Prog languages ------------------------------------
@@ -995,7 +1040,7 @@
        ;; (http . t)
        ;; (perl . t)
      (python . t)
-       ;; (php . t) ;; org-babel does not currently support php.  That is really sad.
+       ;; (php . t) ;; org-babel does not currently support php. That is really sad
        ;; (R . t)
        ;; (scheme . t)
      (shell . t)
@@ -1074,7 +1119,7 @@
       :unnarrowed t)
      ;;Finally got the template function work!
      ("p" "project" plain (function (lambda () (gy/file-to-string-by-filename (expand-file-name "MyNotes/Templates/ProjectTemplate.org" gy-dropbox-location))))
-      :if-new (file+head "@Inbox/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: Project\n#+filetags: Project\n#+date: %U\n\n")
+      :if-new (file+head "80-GTDTasks/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: Project\n#+filetags: Project\n#+date: %U\n\n")
       :unnarrowed t)
 
      ("l" "literature" plain (function (lambda () (gy/file-to-string-by-filename (expand-file-name "MyNotes/Templates/LiteratureTemplate.org" gy-dropbox-location))))
@@ -1090,8 +1135,8 @@
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
-	 ("C-c n I" . org-roam-node-insert-immediate)
-	 ("C-c n p" . gy/org-roam-find-project)
+         ("C-c n I" . org-roam-node-insert-immediate)
+         ("C-c n p" . gy/org-roam-find-project)
          :map org-mode-map
          ("C-M-i"    . completion-at-point))
   
@@ -1131,7 +1176,7 @@
 ;;  "Add index to file of currently visited buffer, if applicable."
 ;;  (interactive)
 ;;  (unless (and (buffer-file-name)
-;;		       (file-exists-p (buffer-file-name)))
+;;                     (file-exists-p (buffer-file-name)))
 ;;    (user-error "Current buffer is not visiting a file that exists on disk."))
 
 ;;  (unless (gy/file-ext-org-p (buffer-file-name))
